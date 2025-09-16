@@ -1,8 +1,44 @@
+  <!-- Edit Task Modal -->
+  <div *ngIf="showEditTaskModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Edit Task</h3>
+        <button class="close-btn" (click)="closeEditTaskModal()">&times;</button>
+      </div>
+      <form (ngSubmit)="saveEditTask()" class="modal-form">
+        <div class="form-group">
+          <label for="editTaskTitle">Title</label>
+          <input type="text" id="editTaskTitle" [(ngModel)]="editTask.title" name="editTaskTitle" required>
+        </div>
+        <div class="form-group">
+          <label for="editTaskDescription">Description</label>
+          <textarea id="editTaskDescription" [(ngModel)]="editTask.description" name="editTaskDescription"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="editTaskDate">Date</label>
+          <input type="date" id="editTaskDate" [(ngModel)]="editTask.date" name="editTaskDate">
+        </div>
+        <div class="form-group">
+          <label for="editTaskTime">Time</label>
+          <input type="time" id="editTaskTime" [(ngModel)]="editTask.time" name="editTaskTime">
+        </div>
+        <div class="form-group">
+          <label for="editTaskDuration">Duration (minutes)</label>
+          <input type="number" id="editTaskDuration" [(ngModel)]="editTask.duration" name="editTaskDuration" min="1" step="1">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeEditTaskModal()">Cancel</button>
+          <button type="submit" class="submit-btn" [disabled]="!editTask.title?.trim()">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+<app-navbar style="position: fixed; top: 0px;left: 0px; width: 100%;" [showPowerButton]="true" (logoutClick)="logout()"></app-navbar>
+<div style="height: 80px;"></div>
 <div class="home-container">
-  <!-- Header Section -->
   <header class="header">
     <div class="welcome-section">
-      <h1 class="welcome-title">Welcome back, {{ userName }}</h1>
+      <h1 class="welcome-title">Welcome back {{ userName }}</h1>
       <p class="welcome-subtitle">Manage your tasks with voice commands or manual entry</p>
     </div>
     <button class="voice-btn" (click)="startVoiceCommand()">
@@ -16,7 +52,6 @@
     </button>
   </header>
 
-  <!-- Upcoming Tasks Section -->
   <section class="task-section">
     <div class="section-header">
       <div class="section-title">
@@ -55,9 +90,18 @@
           <div class="task-info">
             <h3 class="task-title" [class.completed]="task.completed">{{ task.title }}</h3>
             <p class="task-description" *ngIf="task.description">{{ task.description }}</p>
-            <span class="task-date" *ngIf="task.dueDate">Due: {{ formatDate(task.dueDate) }}</span>
+            <span class="task-date" *ngIf="task.date">
+              Date: {{ task.date }}<span *ngIf="task.time"> {{ task.time }}</span>
+              <span *ngIf="task.duration"> ({{ task.duration }} min)</span>
+            </span>
           </div>
-          <button class="delete-btn" (click)="deleteTask(task.id)">
+          <button class="edit-btn" (click)="openEditTaskModal(task)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20h9"/>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19.5 3 21l1.5-4L16.5 3.5z"/>
+            </svg>
+          </button>
+          <button class="delete-btn" (click)="deleteTask(task._id)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="3,6 5,6 21,6"></polyline>
               <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
@@ -68,7 +112,7 @@
     </div>
   </section>
 
-  <!-- All Tasks Section -->
+
   <section class="task-section">
     <div class="section-header">
       <div class="section-title">
@@ -100,10 +144,13 @@
           <div class="task-info">
             <h3 class="task-title" [class.completed]="task.completed">{{ task.title }}</h3>
             <p class="task-description" *ngIf="task.description">{{ task.description }}</p>
-            <span class="task-date" *ngIf="task.dueDate">Due: {{ formatDate(task.dueDate) }}</span>
+            <span class="task-date" *ngIf="task.date">
+              Date: {{ task.date }}<span *ngIf="task.time"> {{ task.time }}</span>
+              <span *ngIf="task.duration"> ({{ task.duration }} min)</span>
+            </span>
             <span class="task-created">Created: {{ formatDate(task.createdAt) }}</span>
           </div>
-          <button class="delete-btn" (click)="deleteTask(task.id)">
+          <button class="delete-btn" (click)="deleteTask(task._id)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="3,6 5,6 21,6"></polyline>
               <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
@@ -114,7 +161,7 @@
     </div>
   </section>
 
-  <!-- New Task Modal -->
+
   <div *ngIf="showNewTaskModal" class="modal-overlay" (click)="closeNewTaskModal()">
     <div class="modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
@@ -148,11 +195,16 @@
         </div>
         
         <div class="form-group">
-          <label for="taskDueDate">Due Date</label>
-          <input type="datetime-local" 
-                 id="taskDueDate" 
-                 [(ngModel)]="newTask.dueDate" 
-                 name="taskDueDate">
+          <label for="taskDate">Date</label>
+          <input type="date" id="taskDate" [(ngModel)]="newTask.date" name="taskDate">
+        </div>
+        <div class="form-group">
+          <label for="taskTime">Time</label>
+          <input type="time" id="taskTime" [(ngModel)]="newTask.time" name="taskTime">
+        </div>
+        <div class="form-group">
+          <label for="taskDuration">Duration (minutes)</label>
+          <input type="number" id="taskDuration" [(ngModel)]="newTask.duration" name="taskDuration" min="1" step="1">
         </div>
         
         <div class="modal-actions">
@@ -164,6 +216,54 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+<!-- Voice Command Modal -->
+<div *ngIf="showVoiceModal" class="modal-overlay" (click)="closeVoiceModal()">
+  <div class="modal voice-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>🎤 Voice Command</h3>
+      <button class="close-btn" (click)="closeVoiceModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="voice-content">
+      <div class="listening-indicator" [class.active]="isListening">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring delay-1"></div>
+        <div class="pulse-ring delay-2"></div>
+        <div class="microphone">🎤</div>
+      </div>
+      
+      <div class="voice-status-box">
+        <span class="voice-status-label">Voice Input:</span>
+        <span class="voice-status-text">{{ voiceCommandResult }}</span>
+      </div>
+      
+      <div class="voice-examples">
+        <h4>Try saying:</h4>
+        <ul>
+          <li>"Schedule a meeting tomorrow at 2 PM"</li>
+          <li>"Create task for staff meeting on 17th September with description team meeting at 12 PM for 30 minutes"</li>
+          <li>"Mark staff meeting as completed"</li>
+          <li>"Email me the next meeting"</li>
+          <li>"Show me today's tasks"</li>
+        </ul>
+      </div>
+      
+      <div class="voice-controls">
+        <button *ngIf="isListening" class="cancel-btn" (click)="stopVoiceCommand()">
+          Stop Listening
+        </button>
+        <button *ngIf="!isListening && !voiceCommandResult" class="submit-btn" (click)="startVoiceCommand()">
+          Start Again
+        </button>
+      </div>
     </div>
   </div>
 </div>

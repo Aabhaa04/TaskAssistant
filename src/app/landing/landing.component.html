@@ -1,0 +1,123 @@
+
+<div class="landing-container">
+  <app-navbar style="position: fixed; top: 0px;left: 0px; width: 100%; z-index: 100;" [showPowerButton]="false"></app-navbar>
+  <div class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <span class="gradient-text">Task Assistant</span>
+      </h1>
+      <p class="hero-description">
+        Supercharge your productivity with an intelligent assistant that helps you schedule, track, and complete your daily tasks effortlessly.<br>
+        <span class="highlight">Voice input</span>, <span class="highlight">smart reminders</span>, and <span class="highlight">seamless organization</span>—all in one place.
+      </p>
+      <div class="hero-actions">
+        <button class="cta-btn" (click)="openAuth('signup')">Get Started Free</button>
+        <button class="cta-btn secondary" (click)="openAuth('signin')">Sign In</button>
+      </div>
+    </div>
+    <div class="hero-visual">
+        <div class="hero-svg-visual">
+          <svg width="600" height="340" viewBox="0 0 600 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Calendar (left, moved down) -->
+            <g class="svg-calendar" transform="translate(10,80)">
+              <rect x="0" y="0" width="140" height="110" rx="18" fill="#e0f2fe" stroke="#06b6d4" stroke-width="4"/>
+              <rect x="0" y="25" width="140" height="85" rx="12" fill="#fff"/>
+              <rect x="15" y="40" width="28" height="28" rx="6" fill="#bae6fd"/>
+              <rect x="55" y="40" width="28" height="28" rx="6" fill="#bae6fd"/>
+              <rect x="95" y="40" width="28" height="28" rx="6" fill="#bae6fd"/>
+              <rect x="15" y="80" width="28" height="28" rx="6" fill="#bae6fd"/>
+              <rect x="55" y="80" width="28" height="28" rx="6" fill="#bae6fd"/>
+              <rect x="95" y="80" width="28" height="28" rx="6" fill="#bae6fd"/>
+              <rect x="0" y="0" width="140" height="25" rx="8" fill="#06b6d4"/>
+              <circle cx="25" cy="12" r="6" fill="#fff"/>
+              <circle cx="100" cy="12" r="6" fill="#fff"/>
+            </g>
+            <!-- Clock (center, moved down) -->
+            <g class="svg-clock" transform="translate(230,50)">
+              <circle cx="70" cy="90" r="65" fill="#f8fafb" stroke="#10b981" stroke-width="4"/>
+              <circle cx="70" cy="90" r="55" fill="#fff"/>
+              <line x1="70" y1="90" x2="70" y2="50" stroke="#10b981" stroke-width="6" stroke-linecap="round"/>
+              <line x1="70" y1="90" x2="115" y2="90" stroke="#06b6d4" stroke-width="6" stroke-linecap="round"/>
+              <circle cx="70" cy="90" r="8" fill="#06b6d4"/>
+            </g>
+            <!-- Tick (right, moved down, new style) -->
+            <g class="svg-tick" transform="translate(440,80)">
+              <circle cx="60" cy="60" r="55" fill="#f3e8ff" stroke="#a21caf" stroke-width="4"/>
+              <circle cx="60" cy="60" r="45" fill="#fff"/>
+              <polyline points="40,60 58,80 90,40" fill="none" stroke="#a21caf" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="60" cy="60" r="18" fill="#a21caf" opacity="0.08"/>
+            </g>
+          </svg>
+        </div>
+    </div>
+  </div>
+
+  <div class="features-section">
+    <div class="feature-card">
+      <span class="feature-icon">🗓️</span>
+      <h3>Smart Task Scheduling</h3>
+      <p>Let AI organize your day and suggest optimal times for your tasks.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🎤</span>
+      <h3>Voice Input</h3>
+      <p>Add and manage tasks hands-free using advanced voice recognition.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔔</span>
+      <h3>Intelligent Reminders</h3>
+      <p>Never miss a deadline with proactive, context-aware notifications.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📊</span>
+      <h3>Progress Tracking</h3>
+      <p>Visualize your productivity and celebrate your achievements.</p>
+    </div>
+  </div>
+
+  <div class="auth-card" *ngIf="!showAuthForm">
+    <button class="submitnav-btn" (click)="openAuth('signin')">Sign In</button>
+    <button class="submitnav-btn" (click)="openAuth('signup')">Sign Up</button>
+  </div>
+
+  <div class="modal-overlay" *ngIf="showAuthForm">
+    <div class="modal-content">
+      <button class="close-btn" (click)="closeAuth()">&times;</button>
+      <form *ngIf="activeTab === 'signin'" (ngSubmit)="signIn()" class="auth-form">
+        <h2>Sign In</h2>
+        <div class="form-group">
+          <label for="signinEmail">Email</label>
+          <input type="email" id="signinEmail" [(ngModel)]="signinEmail" name="signinEmail" required>
+        </div>
+        <div class="form-group">
+          <label for="signinPassword">Password</label>
+          <input type="password" id="signinPassword" [(ngModel)]="signinPassword" name="signinPassword" required>
+        </div>
+        <button type="submit" class="submit-btn">Sign In</button>
+        <div class="form-error" *ngIf="signinError">{{ signinError }}</div>
+      </form>
+      <form *ngIf="activeTab === 'signup'" (ngSubmit)="signUp()" class="auth-form">
+        <h2>Sign Up</h2>
+        <div class="form-group">
+          <label for="signupName">Name</label>
+          <input type="text" id="signupName" [(ngModel)]="signupName" name="signupName" required>
+        </div>
+        <div class="form-group">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" [(ngModel)]="signupEmail" name="signupEmail" required>
+        </div>
+        <div class="form-group">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" [(ngModel)]="signupPassword" name="signupPassword" required>
+        </div>
+        <div class="form-group">
+          <label for="signupConfirmPassword">Confirm Password</label>
+          <input type="password" id="signupConfirmPassword" [(ngModel)]="signupConfirmPassword" name="signupConfirmPassword" required>
+        </div>
+        <button type="submit" class="submit-btn">Sign Up</button>
+        <div class="form-error" *ngIf="signupError">{{ signupError }}</div>
+      </form>
+    </div>
+  </div>
+</div>
+
