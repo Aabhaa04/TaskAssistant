@@ -5,7 +5,6 @@ const emailService = require('./emailService');
 
 class ReminderService {
   start() {
-    // Run every minute to check for upcoming tasks
     cron.schedule('* * * * *', async () => {
       await this.checkAndSendReminders();
     });
@@ -17,7 +16,6 @@ class ReminderService {
     try {
       const now = new Date();
       
-      // Get all tasks that haven't sent reminders yet
       const tasks = await Task.find({
         reminderSent: false,
         completed: false,
@@ -34,7 +32,6 @@ class ReminderService {
         const timeDiff = scheduledDateTime.getTime() - now.getTime();
         const minutesUntilTask = Math.floor(timeDiff / (1000 * 60));
 
-        // Send reminder if task is 9-10 minutes away (1-minute window to account for cron timing)
         if (minutesUntilTask >= 9 && minutesUntilTask <= 10) {
           tasksNeedingReminders.push(task);
         }
@@ -47,19 +44,17 @@ class ReminderService {
           const emailSent = await emailService.sendTaskReminder(task.user, task);
           
           if (emailSent) {
-            // Mark reminder as sent
             await Task.findByIdAndUpdate(task._id, { reminderSent: true });
           }
         } else {
-          console.warn(`⚠️ Task ${task._id} has no associated user or email`);
+          console.warn(`Task ${task._id} has no associated user or email`);
         }
       }
     } catch (error) {
-      console.error('❌ Error in reminder service:', error);
+      console.error('Error in reminder service:', error);
     }
   }
 
-  // Method to manually trigger reminder check (useful for testing)
   async triggerReminderCheck() {
     await this.checkAndSendReminders();
   }

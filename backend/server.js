@@ -67,7 +67,7 @@
 // app.listen(PORT, () => {
 //   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 // });
-
+require("dotenv").config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');

@@ -1,7 +1,6 @@
 const Task = require('../models/Task');
 const User = require('../models/User');
 
-// ✅ Get user info (just username)
 exports.getUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('username');
@@ -11,7 +10,6 @@ exports.getUser = async (req, res) => {
   }
 };
 
-// ✅ Get all tasks
 exports.getTasks = async (req, res) => {
   try {
     const tasks = await Task.find({ user: req.user.id });
@@ -21,7 +19,6 @@ exports.getTasks = async (req, res) => {
   }
 };
 
-// ✅ Get unfinished tasks
 exports.getUnfinishedTasks = async (req, res) => {
   try {
     const tasks = await Task.find({ user: req.user.id, completed: false });
@@ -31,7 +28,6 @@ exports.getUnfinishedTasks = async (req, res) => {
   }
 };
 
-// ✅ Create new task
 exports.createTask = async (req, res) => {
   try {
     const newTask = new Task({
@@ -45,7 +41,6 @@ exports.createTask = async (req, res) => {
   }
 };
 
-// ✅ Update task
 exports.updateTask = async (req, res) => {
   try {
     let task = await Task.findOne({ _id: req.params.id, user: req.user.id });
@@ -58,7 +53,6 @@ exports.updateTask = async (req, res) => {
   }
 };
 
-// ✅ Delete task
 exports.deleteTask = async (req, res) => {
   try {
     const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.user.id });
@@ -70,12 +64,8 @@ exports.deleteTask = async (req, res) => {
 };
 
 
-// Add these imports at the top
 const reminderService = require('../services/reminderService');
 
-// Add these new methods to your existing exports
-
-// Manual trigger for reminders (useful for testing)
 exports.triggerReminders = async (req, res) => {
   try {
     await reminderService.triggerReminderCheck();
@@ -92,7 +82,6 @@ exports.triggerReminders = async (req, res) => {
   }
 };
 
-// Get upcoming tasks that need reminders (for debugging)
 exports.getUpcomingReminders = async (req, res) => {
   try {
     const now = new Date();
@@ -133,7 +122,6 @@ exports.getUpcomingReminders = async (req, res) => {
   }
 };
 
-// Reset reminder status for a task
 exports.resetReminder = async (req, res) => {
   try {
     const task = await Task.findOneAndUpdate(
@@ -155,6 +143,31 @@ exports.resetReminder = async (req, res) => {
     res.status(500).json({ 
       success: false, 
       error: error.message 
+    });
+  }
+};
+const voiceCommandService = require('../services/voiceCommandService');
+
+exports.processVoiceCommand = async (req, res) => {
+  try {
+    const { transcript } = req.body;
+    
+    if (!transcript || transcript.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Transcript is required'
+      });
+    }
+
+    const result = await voiceCommandService.processVoiceCommand(transcript, req.user.id);
+    
+    res.json(result);
+  } catch (error) {
+    console.error('Voice command processing error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error processing voice command',
+      error: error.message
     });
   }
 };

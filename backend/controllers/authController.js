@@ -2,21 +2,16 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { validateSignup, validateSignin } = require('../utils/validation');
 
-// Generate JWT Token
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE
   });
 };
 
-// @desc    Register user
-// @route   POST /api/auth/signup
-// @access  Public
 const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Validate input
     const validation = validateSignup(name, email, password);
     if (!validation.isValid) {
       return res.status(400).json({
@@ -26,7 +21,6 @@ const signup = async (req, res) => {
       });
     }
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       return res.status(400).json({
@@ -35,14 +29,12 @@ const signup = async (req, res) => {
       });
     }
 
-    // Create user
     const user = await User.create({
       name: name.trim(),
       email: email.toLowerCase(),
       password
     });
 
-    // Generate token
     const token = generateToken(user._id);
 
     res.status(201).json({
@@ -65,14 +57,11 @@ const signup = async (req, res) => {
   }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/signin
-// @access  Public
+
 const signin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate input
     const validation = validateSignin(email, password);
     if (!validation.isValid) {
       return res.status(400).json({
@@ -82,7 +71,6 @@ const signin = async (req, res) => {
       });
     }
 
-    // Check if user exists and get password
     const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
     if (!user) {
       return res.status(401).json({
@@ -91,7 +79,6 @@ const signin = async (req, res) => {
       });
     }
 
-    // Check password
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -100,7 +87,6 @@ const signin = async (req, res) => {
       });
     }
 
-    // Generate token
     const token = generateToken(user._id);
 
     res.status(200).json({
@@ -123,9 +109,6 @@ const signin = async (req, res) => {
   }
 };
 
-// @desc    Get current user
-// @route   GET /api/auth/me
-// @access  Private
 const getMe = async (req, res) => {
   try {
     const user = req.user;

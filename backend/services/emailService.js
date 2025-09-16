@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 
 class EmailService {
   constructor() {
-    this.transporter = nodemailer.createTransport({  // Remove "er" from createTransporter
+    this.transporter = nodemailer.createTransport({  
       service: 'gmail',
       auth: {
         user: process.env.EMAIL_USER,
@@ -42,10 +42,10 @@ class EmailService {
 
     try {
       await this.transporter.sendMail(mailOptions);
-      console.log(`✅ Reminder sent to ${user.email} for task: ${task.title}`);
+      console.log(`Reminder sent to ${user.email} for task: ${task.title}`);
       return true;
     } catch (error) {
-      console.error(`❌ Failed to send reminder to ${user.email}:`, error.message);
+      console.error(`Failed to send reminder to ${user.email}:`, error.message);
       return false;
     }
   }
